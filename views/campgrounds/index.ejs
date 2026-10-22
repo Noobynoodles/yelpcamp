@@ -1,0 +1,56 @@
+<% layout('layouts/boilerplate') %>
+    <div id="cluster-map"></div>
+    <h1>All Campgrounds</h1>
+    <div>
+        <a href="/campgrounds/new">Add Campground</a>
+    </div>
+
+    <% for(let campground of campgrounds){ %>
+        <div class="card mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <% if (campground.images && campground.images.length> 0) { %>
+                        <img src="<%= campground.images[0].url %>" class="img-fluid campground-thumbnail"
+                            alt="<%= campground.title %>">
+                        <% } else { %>
+                            <div class="bg-light text-muted text-center p-5">
+                                No image available
+                            </div>
+                            <% } %>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="class-title">
+                            <%= campground.title %>
+                        </h5>
+                        <p class="card-text">
+                            <%= campground.description %>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <%= campground.location %>
+                            </small>
+                        </p>
+                        <a class="btn btn-primary" href="/campgrounds/<%= campground._id %>">View
+                            <%=campground.title%>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+            <%- "<script>" %>
+                const maptilerApiKey = <%- JSON.stringify(process.env.MAPTILER_API_KEY || "" ) %>;
+                    const campgrounds = {
+                    type: "FeatureCollection",
+                    features: <%- JSON.stringify( campgrounds.map(campground=> ({
+                        type: "Feature",
+                        geometry: campground.geometry,
+                        properties: { popUpMarkup: campground?.properties?.popUpMarkup }
+                        }))
+                        ) %>
+                        };
+                        <%- "</script>" %>
+
+                            <script src="/javascripts/clusterMap.js"></script>
